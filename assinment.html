@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script>
+alert("start");
+var FINISH = "finish";
+var O_START = true;
+var START_SYMBOL;
+var NEXT_SYMBOL;
+var EMPTY_SYMBOL = "N";
+
+if(O_START){
+	START_SYMBOL = "O";
+	NEXT_SYMBOL = "X";
+}
+else{
+	START_SYMBOL = "X";
+	NEXT_SYMBOL = "O";
+}
+
+var WinPatter=[];
+WinPatter[0] = [0,1,2];
+WinPatter[1] = [3,4,5];
+WinPatter[2] = [6,7,8];
+WinPatter[3] = [0,3,6];
+WinPatter[4] = [1,4,7];
+WinPatter[5] = [2,5,8];
+WinPatter[6] = [0,4,8];
+WinPatter[7] = [2,4,6];
+
+var play1 = [];
+var play2 = [];
+var play3 = [];
+var play4 = [];
+var play5 = [];
+var play6 = [];
+var play7 = [];
+var play8 = [];
+var play9 = [];
+
+
+var testArray = [];
+// test();
+checkNextStep();
+
+function test(){
+
+	var temp1 = [];
+
+	for(var i=0;i<9;i++){
+
+		temp1[i]=EMPTY_SYMBOL;
+	}
+
+	play1.push(temp1);
+	alert(play1[0]);
+
+}
+
+function deepCopy (arr) {
+	var forCopy = [];
+	forCopy = arr.slice();
+    return forCopy;
+}
+
+function drawTableForArray(array, array_code){
+	var body = document.getElementsByTagName("body")[0];
+	var tbl = document.createElement("table");
+
+	var playCount = 0;
+
+	document.write(array_code+' step:'+array.length+'<br>');
+	for (playCount = 0; playCount < array.length; playCount++) {
+
+		var tempPlay = array[playCount];
+		var  cloumnCount = 0;
+
+		tbl = document.createElement("table");
+
+		for(cloumnCount = 0;cloumnCount<9;cloumnCount++){
+			if(cloumnCount==0||cloumnCount==3||cloumnCount==6){
+				var row = document.createElement("tr");
+			}
+
+			var cell = document.createElement("td");
+
+			var textNode = tempPlay[cloumnCount]==EMPTY_SYMBOL ? " " : tempPlay[cloumnCount];
+			cell.style.width="20px";
+			cell.style.height="20px";
+			cell.style.textAlign = "center";
+			var cellText = document.createTextNode(textNode); 
+
+			cell.appendChild(cellText);
+			row.appendChild(cell);
+			
+			if(cloumnCount==0||cloumnCount==3||cloumnCount==6){
+				tbl.appendChild(row);
+			}
+		}
+
+		tbl.setAttribute("border", "1");
+		tbl.style.display = "inline-block";
+		tbl.style.margin = "5px";
+		body.appendChild(tbl);
+	}
+	document.write('<br>');
+	document.write('<br>');
+}
+
+function checkNextStep(){
+
+	var roundNumber = 0;
+	var index = 0;
+
+	for(roundNumber = 0; roundNumber<9;roundNumber++){
+		var tempPlay1 = genEmpty();
+		tempPlay1[roundNumber] = START_SYMBOL
+
+		play1.push(tempPlay1);
+	}
+
+	for(roundNumber=0;roundNumber<play1.length;roundNumber++){
+
+		for(index=0;index<9;index++){
+
+			var tempPlay2 = deepCopy(play1[roundNumber]);
+
+			if(tempPlay2[index] == EMPTY_SYMBOL){
+				tempPlay2[index] = NEXT_SYMBOL;
+
+				if(!compareTheSame(tempPlay2,2)){
+					play2.push(tempPlay2);
+				}
+			}
+		}
+
+	}
+
+	for(roundNumber=0;roundNumber<play2.length;roundNumber++){
+
+		for(index=0;index<9;index++){
+
+			var tempPlay3 = deepCopy(play2[roundNumber]);
+
+			if(tempPlay3[index] == EMPTY_SYMBOL){
+				tempPlay3[index] = START_SYMBOL;
+
+				if(!compareTheSame(tempPlay3,3)){
+					play3.push(tempPlay3);
+					
+				}
+			}
+		}
+
+	}
+
+	for(roundNumber=0;roundNumber<play3.length;roundNumber++){
+
+		for(index=0;index<9;index++){
+
+			var tempPlay4 = deepCopy(play3[roundNumber]);
+
+			if(tempPlay4[index] == EMPTY_SYMBOL){
+				var readyWinCount = getFinishSoonCount(tempPlay4, START_SYMBOL);
+
+				tempPlay4[index] = NEXT_SYMBOL;
+
+				var afterPlayReadyWinCount = getFinishSoonCount(tempPlay4, START_SYMBOL);
+
+				if(readyWinCount == 0 || (readyWinCount-1)==afterPlayReadyWinCount){
+
+					if(!compareTheSame(tempPlay4,4)){
+						play4.push(tempPlay4);
+					}
+				}
+			}
+		}
+	}
+
+	for(roundNumber=0;roundNumber<play4.length;roundNumber++){
+
+		for(index=0;index<9;index++){
+
+			var tempPlay5 = deepCopy(play4[roundNumber]);
+
+			if(isFinish(tempPlay5)!=FINISH && tempPlay5[index] == EMPTY_SYMBOL){
+				var readyWinCount = getFinishSoonCount(tempPlay5, START_SYMBOL);
+
+				tempPlay5[index] = START_SYMBOL;
+
+				var afterPlayReadyWinCount = getFinishSoonCount(tempPlay5, NEXT_SYMBOL);
+
+				if(readyWinCount == 0 || (readyWinCount-1)==afterPlayReadyWinCount){
+
+					if(!compareTheSame(tempPlay5,5)){
+						play5.push(tempPlay5);
+					}
+				}
+			}
+		}
+	}
+
+	for(roundNumber=0;roundNumber<play5.length;roundNumber++){
+
+		for(index=0;index<9;index++){
+
+			var tempPlay6 = deepCopy(play5[roundNumber]);
+
+			if(isFinish(tempPlay6)!=FINISH && tempPlay6[index] == EMPTY_SYMBOL){
+				var readyWinCount = getFinishSoonCount(tempPlay6, START_SYMBOL);
+
+				tempPlay6[index] = NEXT_SYMBOL;
+
+				var afterPlayReadyWinCount = getFinishSoonCount(tempPlay6, NEXT_SYMBOL);
+
+				if(readyWinCount == 0 || (readyWinCount-1)==afterPlayReadyWinCount){
+
+					if(!compareTheSame(tempPlay6,6)){
+						play6.push(tempPlay6);
+					}
+				}
+			}
+		}
+	}
+
+	for(roundNumber=0;roundNumber<play6.length;roundNumber++){
+
+		for(index=0;index<9;index++){
+
+			var tempPlay7 = deepCopy(play6[roundNumber]);
+
+			if(isFinish(tempPlay7)!=FINISH && tempPlay7[index] == EMPTY_SYMBOL){
+				var readyWinCount = getFinishSoonCount(tempPlay7, START_SYMBOL);
+
+				tempPlay7[index] = START_SYMBOL;
+
+				var afterPlayReadyWinCount = getFinishSoonCount(tempPlay7, NEXT_SYMBOL);
+
+				if(readyWinCount == 0 || (readyWinCount-1)==afterPlayReadyWinCount){
+
+					if(!compareTheSame(tempPlay7,7)){
+						play7.push(tempPlay7);
+					}
+				}
+			}
+		}
+	}
+
+	for(roundNumber=0;roundNumber<play7.length;roundNumber++){
+
+		for(index=0;index<9;index++){
+
+			var tempPlay8 = deepCopy(play7[roundNumber]);
+
+			if(isFinish(tempPlay8)!=FINISH && tempPlay8[index] == EMPTY_SYMBOL){
+				var readyWinCount = getFinishSoonCount(tempPlay8, START_SYMBOL);
+
+				tempPlay8[index] = NEXT_SYMBOL;
+
+				var afterPlayReadyWinCount = getFinishSoonCount(tempPlay8, NEXT_SYMBOL);
+
+				if(readyWinCount == 0 || (readyWinCount-1)==afterPlayReadyWinCount){
+
+					if(!compareTheSame(tempPlay8,8)){
+						play8.push(tempPlay8);
+					}
+				}
+			}
+		}
+	}
+
+var fff = 0;
+	for(roundNumber=0;roundNumber<play8.length;roundNumber++){
+
+		for(index=0;index<9;index++){
+
+			var tempPlay9 = deepCopy(play8[roundNumber]);
+
+			if(isFinish(tempPlay9)==FINISH){
+				fff++;
+			}
+
+			if(isFinish(tempPlay9)!=FINISH && tempPlay9[index] == EMPTY_SYMBOL){
+
+
+				var readyWinCount = getFinishSoonCount(tempPlay9, START_SYMBOL);
+
+				tempPlay9[index] = START_SYMBOL;
+
+				var afterPlayReadyWinCount = getFinishSoonCount(tempPlay9, NEXT_SYMBOL);
+
+				if(readyWinCount == 0 || (readyWinCount-1)==afterPlayReadyWinCount){
+
+					if(!compareTheSame(tempPlay9,9)){
+						play9.push(tempPlay9);
+					}
+				}
+			}
+		}
+	}
+
+alert(fff);
+	drawTableForArray(play1,1);
+	drawTableForArray(play2,2);
+	drawTableForArray(play3,3);
+	drawTableForArray(play4,4);
+	drawTableForArray(play5,5);
+	drawTableForArray(play6,6);
+	drawTableForArray(play7,7);
+	drawTableForArray(play8,8);
+	drawTableForArray(play9,9);
+}
+
+function countRemainStepNumber(tmpRecore){
+	var count = 0;
+	var tt;
+	alert(tmpRecore);
+	for (tt=0; tt<9; tt++){
+		if(tmpRecore[tt] == " "){
+			count++;
+		}
+	}
+
+	return count;
+}
+
+function genEmpty(){
+	var tmp = [];
+
+	for (var i=0; i<9; i++){
+        tmp[i] = EMPTY_SYMBOL;
+    }
+    return tmp;
+}
+
+function compareTheSame(tmp2, now_step){
+
+	var baseCompare = getPlayArray(now_step);
+
+	var baseCount = 0;
+	var tt = 0;
+
+	if(baseCompare.length == 0){
+
+		return false;
+	}
+
+	for(baseCount=0;baseCount<baseCompare.length;baseCount++){
+
+		var tmp1 = baseCompare[baseCount];
+
+		if(checkTwoArrayTheSame(tmp1,tmp2)){
+			return true;
+		}
+
+	}
+	return false;
+}
+
+function checkTwoArrayTheSame(array1, array2){
+
+	var mm=0;
+
+	for(mm=0;mm<9;mm++){
+
+		if(array1[mm] != array2[mm]){
+			return false;
+		}
+	}
+	return true;
+}
+
+function getPlayArray(now_step){
+
+	if(now_step == 1)
+		return play1;
+	else if(now_step == 2)
+		return play2;
+	else if(now_step == 3)
+		return play3;
+	else if(now_step == 4)
+		return play4;
+	else if(now_step == 5)
+		return play5;
+	else if(now_step == 6)
+		return play6;
+	else if(now_step == 7)
+		return play7;
+	else if(now_step == 8)
+		return play8;
+	else if(now_step == 9)
+		return play9;
+}
+
+function isFinish(array){
+	var winPatternNumber;
+
+	for(winPatternNumber=0;winPatternNumber<WinPatter.length;winPatternNumber++){
+		var tmpWinCheck = WinPatter[winPatternNumber];
+		var winPos0 = tmpWinCheck[0];
+		var winPos1 = tmpWinCheck[1];
+		var winPos2 = tmpWinCheck[2];
+
+
+		if(START_SYMBOL == array[winPos0] && START_SYMBOL == array[winPos1] 
+			&& START_SYMBOL == array[winPos2]){
+
+			return FINISH;
+		}else if(NEXT_SYMBOL == array[winPos0] && NEXT_SYMBOL == array[winPos1] 
+			&& NEXT_SYMBOL == array[winPos2]){
+
+			return FINISH;
+		}
+	}
+}
+
+//判斷對方是否快獲勝,差一步獲勝,返回快贏的數量
+//symbol:對手的symbol
+function getFinishSoonCount(array, symbol){
+
+	var winPatternNumber;
+	var winSoonCount = 0;
+
+	for(winPatternNumber=0;winPatternNumber<WinPatter.length;winPatternNumber++){
+
+		var tmpCheck = WinPatter[winPatternNumber];
+
+		if(symbol == array[tmpCheck[0]] && array[tmpCheck[0]] == array[tmpCheck[1]] && 
+			array[tmpCheck[2]] == EMPTY_SYMBOL){
+
+			winSoonCount++;
+		}else if(symbol == array[tmpCheck[0]] && array[tmpCheck[0]] == array[tmpCheck[2]] 
+			&& array[tmpCheck[1]] == EMPTY_SYMBOL){
+
+			winSoonCount++;
+		}else if(symbol == array[tmpCheck[1]] && array[tmpCheck[1]] == array[tmpCheck[2]] && 
+			array[tmpCheck[0]] == EMPTY_SYMBOL){
+
+			winSoonCount++;
+		}
+		
+	}
+
+	return winSoonCount;
+
+}
+
+</script>
+
+</body>
+</html>
+
